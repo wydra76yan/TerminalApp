@@ -1,0 +1,13 @@
+{
+  "name": "TerminalApp",
+  "version": "1.0.0",
+  "description": "no",
+  "main": "index.js",
+  "repository": "https://github.com/wydra76yan/TerminalApp.git",
+  "author": "wydra76yan <yan@vydra.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.15.0",
+    "inquirer": "^5.1.0"
+  }
+}
