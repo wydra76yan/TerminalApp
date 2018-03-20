@@ -19,6 +19,7 @@ const createTODOs = [
   },
 ];
 
+
 const todos = [];
 
 program
@@ -36,8 +37,8 @@ program
     .alias('r')
     .description('Show TODO item by ID')
     .action(() => {
-      prompt().then(answers => {
-        console.log(answers);
+      prompt(createTODOs).then(answers => {
+        console.log(JSON.stringify(todos));
     });
   });
 
@@ -46,8 +47,8 @@ program
     .alias('ls')
     .description('List all TODOs')
     .action(() => {
-      prompt().then(answers => {
-        console.log(todos[]);
+      prompt(answers => {
+      //  console.log(todos[]);
     });
   });
 
