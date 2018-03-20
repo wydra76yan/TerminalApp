@@ -6,7 +6,7 @@ program
   .description('TODO app');
 
 // Craft questions to present to users
-const createQuestions = [
+const createTODOs = [
   {
     type : 'input',
     name : 'title',
@@ -26,8 +26,28 @@ program
   .alias('cr')
   .description('Create new TODO item')
   .action(() => {
-    prompt(createQuestions).then(answers => {
-      console.log(answers);
+    prompt(createTODOs).then(answers => {
+      todos.push(answers);
+    });
+  });
+
+  program
+    .command('read')
+    .alias('r')
+    .description('Show TODO item by ID')
+    .action(() => {
+      prompt().then(answers => {
+        console.log(answers);
+    });
+  });
+
+  program
+    .command('list')
+    .alias('ls')
+    .description('List all TODOs')
+    .action(() => {
+      prompt().then(answers => {
+        console.log(todos[]);
     });
   });
 
