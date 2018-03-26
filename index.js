@@ -50,6 +50,10 @@ function print(...args) {
   console.info(...args);
 }
 
+function findTodoIndex(id, todos) {
+  return todos.findIndex((todo) => todo.id === id);
+}
+
 function createTodo(data) {
   return {
     id: guid(),
@@ -69,6 +73,15 @@ function createTodoItem(data) {
       return saveAllTodos(result);
     })
     .then(() => todoId);
+}
+
+function readTodoItem(id) {
+  return getAllTodos()
+  .then((todos) => {
+    const index = findTodoIndex(id, todos);
+    const target = todos[index];
+    return target;
+  })
 }
 
 
@@ -97,5 +110,26 @@ program
         throw error;
       });
   });
+
+  program
+  .command('list')
+  .alias('ls')
+  .description('List all TODOs')
+  .action(() => {
+    getAllTodos().then(print)
+  });
+
+  program
+  .command('read <id>')
+  .alias('r')
+  .description('Print TODO item')
+  .action((id) => {
+    readTodoItem(id)
+    .then(print)
+    .catch((e) => {
+      throw e;
+    })
+  })
+
 
 program.parse(process.argv);
