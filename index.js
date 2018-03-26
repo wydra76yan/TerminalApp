@@ -94,7 +94,12 @@ function readTodoItem(id) {
   .then((todos) => {
     const index = findTodoIndex(id, todos);
     const target = todos[index];
-    return target;
+    if (target != undefined) {
+      return target;
+    }
+    else {
+      return 'TODO item not found';
+    }
   })
 }
 
@@ -104,7 +109,7 @@ function removeTodoItem(id) {
     const index = findTodoIndex(id, todos);
     const result = [...todos];
     const target = result.splice(index, 1);
-
+     //:TODO count of deleted items
     return saveAllTodos(result).then (() => result.lenght);
   })
 }
