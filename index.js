@@ -70,6 +70,12 @@ function updateTodo(change, todo) {
   };
 }
 
+// function commentTodo(comment, todo) {
+//   return {
+//     ...todo,
+//     ...comment
+//   };
+// }
 
 function createTodoItem(data) {
    let todoId;
@@ -143,6 +149,14 @@ const updateQuestions = [
   },
 ];
 
+const commentQuestions = [
+  {
+    type : 'input',
+    name : 'comment',
+    message : 'Comment...',
+  },
+];
+
 
 program
   .command('create')
@@ -199,6 +213,40 @@ program
     .catch((e) => {
       throw e;
     })
+  })
+
+  program
+  .command('like <id>')
+  .alias('l')
+  .description('Like TODO item')
+  .action((id) => {
+    updateTodoItem(id, {isLiked:true})
+      .catch((e) => {
+      throw e;
+      })
+  })
+
+  program
+  .command('unlike <id>')
+  .alias('ul')
+  .description('Like TODO item')
+  .action((id) => {
+    updateTodoItem(id, {isLiked:false})
+      .catch((e) => {
+      throw e;
+      })
+  })
+
+  program
+  .command('comment <id>')
+  .alias('cm')
+  .description('Comment TODO item')
+  .action((id) => {
+    prompt(commentQuestions)
+    .then(({comment}) => updateTodoItem(id, {comment}))
+      .catch((e) => {
+      throw e;
+      })
   })
 
 program.parse(process.argv);
