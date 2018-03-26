@@ -63,6 +63,14 @@ function createTodo(data) {
   };
 }
 
+function updateTodo(change, todo) {
+  return {
+    ...todo,
+    ...change
+  };
+}
+
+
 function createTodoItem(data) {
    let todoId;
   return getAllTodos()
@@ -84,6 +92,30 @@ function readTodoItem(id) {
   })
 }
 
+function removeTodoItem(id) {
+  return getAllTodos()
+  .then((todos) => {
+    const index = findTodoIndex(id, todos);
+    const result = [...todos];
+    const target = result.splice(index, 1);
+
+    return saveAllTodos(result).then (() => result.lenght);
+  })
+}
+
+function updateTodoItem(id, change) {
+  return getAllTodos()
+  .then((todos) => {
+    const index = findTodoIndex(id, todos);
+    const result = [...todos];
+    const target = todos[index];
+
+    result.splice(index, 1, updateTodo(change, target));
+
+    return saveAllTodos(result);
+  })
+  .then(() => (id))
+}
 
 const createQuestions = [
   {
@@ -98,9 +130,23 @@ const createQuestions = [
   },
 ];
 
+const updateQuestions = [
+  {
+    type : 'input',
+    name : 'title',
+    message : 'New title...',
+  },
+  {
+    type : 'input',
+    name : 'description',
+    message : 'New description...',
+  },
+];
+
 
 program
   .command('create')
+  .alias('cr')
   .description('Create new TODO item')
   .action(() => {
     prompt(createQuestions)
@@ -131,5 +177,28 @@ program
     })
   })
 
+  program
+  .command('remove <id>')
+  .alias('re')
+  .description('Remove TODO item')
+  .action((id) =>{
+    removeTodoItem(id)
+    .catch((e) => {
+      throw e;
+    })
+  })
+
+  program
+  .command('update <id>')
+  .alias('up')
+  .description('Update TODO item')
+  .action((id) => {
+    prompt(updateQuestions)
+    .then(({ title, description }) => updateTodoItem(id, { title, description }))
+    .then(print)
+    .catch((e) => {
+      throw e;
+    })
+  })
 
 program.parse(process.argv);
