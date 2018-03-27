@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+const jsonObj = '{"todos":[]}';
+
 program
   .version('0.0.1')
   .description('This is a TODO application');
@@ -22,11 +24,12 @@ const fsWriteFile = util.promisify(fs.writeFile);
 function getAllTodos() {
   return fsReadFile(STORAGE_PATH, { encoding: 'utf8', flag: O_RDONLY | O_CREAT })
     .then((data) => {
-      let jsonText = data;
-      return JSON.parse(jsonText);
+      if (data=='')
+        data = jsonObj;
+      return JSON.parse(data);
     })
     .then((storage) => {
-      return storage.todos;
+      return storage.todos ;
     });
 }
 
@@ -70,12 +73,6 @@ function updateTodo(change, todo) {
   };
 }
 
-// function commentTodo(comment, todo) {
-//   return {
-//     ...todo,
-//     ...comment
-//   };
-// }
 
 function createTodoItem(data) {
    let todoId;
@@ -110,7 +107,8 @@ function removeTodoItem(id) {
     const result = [...todos];
     const target = result.splice(index, 1);
      //:TODO count of deleted items
-    return saveAllTodos(result).then (() => result.lenght);
+    return saveAllTodos(result)
+    .then (() => result.lenght);
   })
 }
 
@@ -202,6 +200,7 @@ program
   .description('Remove TODO item')
   .action((id) =>{
     removeTodoItem(id)
+    .then(print)
     .catch((e) => {
       throw e;
     })
@@ -226,6 +225,7 @@ program
   .description('Like TODO item')
   .action((id) => {
     updateTodoItem(id, {isLiked:true})
+    .then(print)
       .catch((e) => {
       throw e;
       })
@@ -237,6 +237,7 @@ program
   .description('Like TODO item')
   .action((id) => {
     updateTodoItem(id, {isLiked:false})
+    .then(print)
       .catch((e) => {
       throw e;
       })
