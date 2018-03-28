@@ -12,6 +12,7 @@ program
   .description('This is a TODO application');
 
 const STORAGE_PATH = path.resolve('./TODOs.json');
+const REMOVED_TODOS_PATH = path.resolve('./RemovedItems.json');
 const ACCOUNT_ID = 1;
 const { O_APPEND, O_RDONLY, O_CREAT } = fs.constants;
 
@@ -29,7 +30,7 @@ function getAllTodos() {
       return JSON.parse(data);
     })
     .then((storage) => {
-      return storage.todos ;
+      return storage.todos;
     });
 }
 
@@ -37,6 +38,13 @@ function saveAllTodos(todos) {
   return fsOpen(STORAGE_PATH, O_APPEND | O_CREAT)
     .then(() => {
       fsWriteFile(STORAGE_PATH, JSON.stringify({ todos }));
+    });
+}
+
+function saveAllRemovedTodos(removedTodos) {
+  return fsOpen(REMOVED_TODOS_PATH, O_APPEND | O_CREAT)
+    .then(() => {
+      fsWriteFile(REMOVED_TODOS_PATH, JSON.stringify({ removedTodos }));
     });
 }
 
@@ -105,10 +113,13 @@ function removeTodoItem(id) {
   .then((todos) => {
     const index = findTodoIndex(id, todos);
     const result = [...todos];
-    const target = result.splice(index, 1);
+    const removedTodos = result.splice(index, 1);
      //:TODO count of deleted items
     return saveAllTodos(result)
-    .then (() => result.lenght);
+    .then (() => {
+      return saveAllRemovedTodos(removedTodos)
+      .then(() => )
+    });
   })
 }
 
