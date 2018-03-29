@@ -34,6 +34,18 @@ function getAllTodos() {
     });
 }
 
+function getAllRemovedTodos() {
+  return fsReadFile(REMOVED_TODOS_PATH, { encoding: 'utf8', flag: O_RDONLY | O_CREAT })
+    .then((data) => {
+      if (data=='')
+        data = jsonObj;
+      return JSON.parse(data);
+    })
+    .then((storage) => {
+      return storage.removedTodos;
+    });
+}
+
 function saveAllTodos(todos) {
   return fsOpen(STORAGE_PATH, O_APPEND | O_CREAT)
     .then(() => {
@@ -57,7 +69,7 @@ function guid() {
   return s4() + '-' + s4();
 }
 
-function print(...args) {
+function print(args) {
   console.info(...args);
 }
 
@@ -113,12 +125,17 @@ function removeTodoItem(id) {
   .then((todos) => {
     const index = findTodoIndex(id, todos);
     const result = [...todos];
-    const removedTodos = result.splice(index, 1);
+    const removedItem = ((result.splice(index, 1))[0]);
+    console.log('RemovedItems:');
      //:TODO count of deleted items
     return saveAllTodos(result)
     .then (() => {
-      return saveAllRemovedTodos(removedTodos)
-      .then(() => )
+      return getAllRemovedTodos()
+      .then((removedTodos) =>{
+      removedResult = [...removedTodos, removedItem]
+      return saveAllRemovedTodos(removedResult)
+      })
+      .then(() => removedResult.length)
     });
   })
 }
