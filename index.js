@@ -69,7 +69,7 @@ function guid() {
   return s4() + '-' + s4();
 }
 
-function print(args) {
+function print(...args) {
   console.info(...args);
 }
 
@@ -126,8 +126,6 @@ function removeTodoItem(id) {
     const index = findTodoIndex(id, todos);
     const result = [...todos];
     const removedItem = ((result.splice(index, 1))[0]);
-    console.log('RemovedItems:');
-     //:TODO count of deleted items
     return saveAllTodos(result)
     .then (() => {
       return getAllRemovedTodos()
@@ -135,7 +133,7 @@ function removeTodoItem(id) {
       removedResult = [...removedTodos, removedItem]
       return saveAllRemovedTodos(removedResult)
       })
-      .then(() => removedResult.length)
+      .then(() => 'Removed items: ' + removedResult.length)
     });
   })
 }
@@ -147,12 +145,29 @@ function updateTodoItem(id, change) {
     const result = [...todos];
     const target = todos[index];
 
-    result.splice(index, 1, updateTodo(change, target));
+      result.splice(index, 1, updateTodo(change, target));
+      return saveAllTodos(result);
 
-    return saveAllTodos(result);
   })
   .then(() => (id))
 }
+
+function likeTodoItem(id, change) {
+  return getAllTodos()
+  .then((todos) => {
+    const index = findTodoIndex(id, todos);
+    const result = [...todos];
+    const target = todos[index];
+    if (target != undefined) {
+      result.splice(index, 1, updateTodo(change, target));
+      console.log("Like result: " + result[index].isLiked);
+      return  saveAllTodos(result);
+    }else {
+      return 'this item not exist';
+    }
+  })
+}
+
 
 const createQuestions = [
   {
@@ -197,8 +212,8 @@ program
     prompt(createQuestions)
       .then(({ title, description }) => createTodoItem({ title, description }))
       .then(print)
-      .catch((error) => {
-        throw error;
+      .catch((e) => {
+        throw e;
       });
   });
 
@@ -252,8 +267,8 @@ program
   .alias('l')
   .description('Like TODO item')
   .action((id) => {
-    updateTodoItem(id, {isLiked:true})
-    .then(print)
+    likeTodoItem(id, {isLiked:true})
+    //.then(print)
       .catch((e) => {
       throw e;
       })
@@ -264,8 +279,8 @@ program
   .alias('ul')
   .description('Like TODO item')
   .action((id) => {
-    updateTodoItem(id, {isLiked:false})
-    .then(print)
+    likeTodoItem(id, {isLiked:false})
+    //.then(print)
       .catch((e) => {
       throw e;
       })
@@ -278,6 +293,7 @@ program
   .action((id) => {
     prompt(commentQuestions)
     .then(({comment}) => updateTodoItem(id, {comment}))
+    .then(print)
       .catch((e) => {
       throw e;
       })
