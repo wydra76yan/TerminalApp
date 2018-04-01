@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
+
 const jsonObj = '{"todos":[]}';
 const removeJsonObj = '{"removedItems":[]}';
 
@@ -111,6 +112,7 @@ function readTodoItem(id) {
   .then((todos) => {
     const index = findTodoIndex(id, todos);
     const target = todos[index];
+    //const veri = existTodoItem(id);
     if (target != undefined) {
       return target;
     }
@@ -119,6 +121,7 @@ function readTodoItem(id) {
     }
   })
 }
+
 
 function removeTodoItem(id) {
   return getAllTodos()
@@ -319,12 +322,24 @@ program
   .alias('cm')
   .description('Comment TODO item')
   .action((id) => {
-    prompt(commentQuestions)
-    .then(({comment}) => commentTodoItem(id, {comment}))
-    .then(print)
-      .catch((e) => {
-      throw e;
-      })
+    return getAllTodos()
+    .then((todos) => {
+      const index = findTodoIndex(id, todos);
+    //  const result = [...todos];
+      const target = todos[index];
+      if (target != undefined) {
+        prompt(commentQuestions)
+        .then(({comment}) => commentTodoItem(id, {comment}))
+        .then(print)
+          .catch((e) => {
+          throw e;
+          })
+      }else {
+        console.log('TODO item not found')
+      }
+
+    })
+
   })
 
 program.parse(process.argv);
