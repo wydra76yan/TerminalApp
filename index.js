@@ -6,6 +6,7 @@ const path = require('path');
 const util = require('util');
 
 const jsonObj = '{"todos":[]}';
+const removeJsonObj = '{"removedItems":[]}';
 
 program
   .version('0.0.1')
@@ -13,7 +14,6 @@ program
 
 const STORAGE_PATH = path.resolve('./TODOs.json');
 const REMOVED_TODOS_PATH = path.resolve('./RemovedItems.json');
-const ACCOUNT_ID = 1;
 const { O_APPEND, O_RDONLY, O_CREAT } = fs.constants;
 
 //turn async func into promise
@@ -38,7 +38,7 @@ function getAllRemovedTodos() {
   return fsReadFile(REMOVED_TODOS_PATH, { encoding: 'utf8', flag: O_RDONLY | O_CREAT })
     .then((data) => {
       if (data=='')
-        data = jsonObj;
+        data = removeJsonObj;
       return JSON.parse(data);
     })
     .then((storage) => {
@@ -125,16 +125,21 @@ function removeTodoItem(id) {
   .then((todos) => {
     const index = findTodoIndex(id, todos);
     const result = [...todos];
-    const removedItem = ((result.splice(index, 1))[0]);
-    return saveAllTodos(result)
-    .then (() => {
-      return getAllRemovedTodos()
-      .then((removedTodos) =>{
-      removedResult = [...removedTodos, removedItem]
-      return saveAllRemovedTodos(removedResult)
-      })
-      .then(() => 'Removed items: ' + removedResult.length)
-    });
+    const target = todos[index];
+    if (target != undefined) {
+      const removedItem = ((result.splice(index, 1))[0]);
+      return saveAllTodos(result)
+      .then (() => {
+        return getAllRemovedTodos()
+        .then((removedTodos) =>{
+        removedResult = [...removedTodos, removedItem]
+        return saveAllRemovedTodos(removedResult)
+        })
+        .then(() => 'Removed items: ' + removedResult.length)
+      });
+    }else{
+      return 'TODO item not found';
+    }
   })
 }
 
@@ -168,6 +173,17 @@ function likeTodoItem(id, change) {
   })
 }
 
+function commentTodoItem(id, change) {
+  return getAllTodos()
+  .then((todos) => {
+    const index = findTodoIndex(id, todos);
+    const result = [...todos];
+    const target = todos[index];
+      result.splice(index, 1, updateTodo(change, target));
+      return  saveAllTodos(result);
+  })
+  .then(() => (id))
+}
 
 const createQuestions = [
   {
@@ -292,7 +308,7 @@ program
   .description('Comment TODO item')
   .action((id) => {
     prompt(commentQuestions)
-    .then(({comment}) => updateTodoItem(id, {comment}))
+    .then(({comment}) => commentTodoItem(id, {comment}))
     .then(print)
       .catch((e) => {
       throw e;
