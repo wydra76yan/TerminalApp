@@ -144,14 +144,15 @@ function removeTodoItem(id) {
 }
 
 function updateTodoItem(id, change) {
+
   return getAllTodos()
   .then((todos) => {
-    const index = findTodoIndex(id, todos);
-    const result = [...todos];
-    const target = todos[index];
+     const index = findTodoIndex(id, todos);
+     const result = [...todos];
+     const target = todos[index];
 
-      result.splice(index, 1, updateTodo(change, target));
-      return saveAllTodos(result);
+    result.splice(index, 1, updateTodo(change, target));
+    return saveAllTodos(result);
 
   })
   .then(() => (id))
@@ -165,10 +166,10 @@ function likeTodoItem(id, change) {
     const target = todos[index];
     if (target != undefined) {
       result.splice(index, 1, updateTodo(change, target));
-      console.log("Like result: " + result[index].isLiked);
+      console.log("Like status: " + result[index].isLiked);
       return  saveAllTodos(result);
     }else {
-      return 'this item not exist';
+      console.log('TODO item not found');
     }
   })
 }
@@ -270,11 +271,22 @@ program
   .alias('up')
   .description('Update TODO item')
   .action((id) => {
-    prompt(updateQuestions)
-    .then(({ title, description }) => updateTodoItem(id, { title, description }))
-    .then(print)
-    .catch((e) => {
-      throw e;
+    return getAllTodos()
+    .then((todos) => {
+      const index = findTodoIndex(id, todos);
+    //  const result = [...todos];
+      const target = todos[index];
+      if (target != undefined) {
+        prompt(updateQuestions)
+        .then(({ title, description }) => updateTodoItem(id, { title, description }))
+        .then(print)
+        .catch((e) => {
+          throw e;
+        })
+      }else {
+        console.log('TODO item not found')
+      }
+
     })
   })
 
