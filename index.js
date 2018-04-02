@@ -7,7 +7,7 @@ const util = require('util');
 
 
 const jsonObj = '{"todos":[]}';
-const removeJsonObj = '{"removedItems":[]}';
+const removeJsonObj = '{"removedTodos":[]}';
 
 program
   .version('0.0.1')
@@ -70,8 +70,8 @@ function guid() {
   return s4() + '-' + s4();
 }
 
-function print(...args) {
-  console.info(...args);
+function print(args) {
+  console.info(args);
 }
 
 function findTodoIndex(id, todos) {
@@ -130,7 +130,8 @@ function removeTodoItem(id) {
     const result = [...todos];
     const target = todos[index];
     if (target != undefined) {
-      const removedItem = ((result.splice(index, 1))[0]);
+      const removedItem = result.splice(index, 1)[0];
+
       return saveAllTodos(result)
       .then (() => {
         return getAllRemovedTodos()
@@ -147,7 +148,6 @@ function removeTodoItem(id) {
 }
 
 function updateTodoItem(id, change) {
-
   return getAllTodos()
   .then((todos) => {
      const index = findTodoIndex(id, todos);
@@ -242,8 +242,13 @@ program
   .alias('ls')
   .description('List all TODOs')
   .action(() => {
-    getAllTodos().then(print)
-  });
+    getAllTodos()
+    .then((todos) =>
+    todos.map((elem) =>{
+      console.log(JSON.stringify(elem))
+    })
+  )
+});
 
   program
   .command('read <id>')
@@ -251,7 +256,9 @@ program
   .description('Print TODO item')
   .action((id) => {
     readTodoItem(id)
-    .then(print)
+    .then((target) => {
+      console.log(JSON.stringify(target));
+    })
     .catch((e) => {
       throw e;
     })
